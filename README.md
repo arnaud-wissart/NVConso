@@ -1,5 +1,12 @@
 # NVConso
 
+![.NET 8](https://img.shields.io/badge/.NET-8.0-blueviolet)
+![WinForms](https://img.shields.io/badge/Tech-WinForms-008080)
+![License](https://img.shields.io/github/license/arnaud-wissart/NVConso)
+![Platform](https://img.shields.io/badge/Platform-Windows-blue)
+![NVIDIA](https://img.shields.io/badge/GPU-NVIDIA-green)
+![PowerLimit](https://img.shields.io/badge/Feature-Power%20Limit-orange)
+
 🎛️ **NVConso** est un utilitaire Windows léger pour ajuster dynamiquement la **limite de consommation électrique (Power Limit)** de ta carte graphique **NVIDIA**, directement depuis la zone de notification Windows.
 
 ## 🚀 Fonctionnalités
@@ -54,10 +61,6 @@ dotnet test
 ## 📄 Licence
 
 Ce projet est sous licence **MIT** — libre d'utilisation, modification et redistribution.
-
-## 🏷️ Tags GitHub
-
-#NVIDIA #GPU #PowerLimit #NVML #TrayApp #Performance #EcoMode #WinForms #DotNet8 #DevTools
 
 ---
 
