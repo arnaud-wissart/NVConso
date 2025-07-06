@@ -46,14 +46,11 @@ namespace NVConso
             return true;
         }
 
-        public void Shutdown()
-        {
-            nvmlShutdown();
-        }
+        public void Shutdown() => _ = nvmlShutdown();
 
         public uint GetCurrentPowerLimit()
         {
-            nvmlDeviceGetPowerManagementLimit(_device, out uint currentLimit);
+            _ = nvmlDeviceGetPowerManagementLimit(_device, out uint currentLimit);
             return currentLimit;
         }
 

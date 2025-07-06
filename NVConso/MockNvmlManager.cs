@@ -1,45 +1,14 @@
-﻿using Microsoft.VisualBasic;
-using System;
-
-namespace NVConso
+﻿namespace NVConso
 {
-    public class MockNvmlManager : INvmlManager
+    public class MockNvmlManager(uint minLimit, uint maxLimit) : INvmlManager
     {
-        private readonly uint _min;
-        private readonly uint _max;
-        private uint _current;
+        public bool Initialize() => true;
 
-        public MockNvmlManager(uint minLimit, uint maxLimit)
-        {
-            _min = minLimit;
-            _max = maxLimit;
-            _current = maxLimit;
-        }
+        public uint GetCurrentPowerLimit() => maxLimit;
 
-        public bool Initialize()
-        {
-            return true;
-        }
+        public uint GetEcoLimit() => minLimit + (maxLimit - minLimit) * Constants.EcoPercentage / 100;
 
-        public void Shutdown()
-        {
-            // no-op
-        }
-
-        public uint GetCurrentPowerLimit()
-        {
-            return _current;
-        }
-
-        public uint GetEcoLimit()
-        {
-            return (uint)(_min + (_max - _min) * Constants.EcoPercentage / 100);
-        }
-
-        public uint GetPerformanceLimit()
-        {
-            return _max;
-        }
+        public uint GetPerformanceLimit() => maxLimit;
 
         public uint GetPowerLimit(GpuPowerMode mode)
         {
@@ -53,8 +22,13 @@ namespace NVConso
 
         public bool SetPowerLimit(uint targetMilliwatt)
         {
-            _current = Math.Clamp(targetMilliwatt, _min, _max);
+            maxLimit = Math.Clamp(targetMilliwatt, minLimit, maxLimit);
             return true;
+        }
+
+        public void Shutdown()
+        {
+            // no-op
         }
     }
 }

@@ -30,9 +30,7 @@
             _trayIcon.MouseUp += (s, e) =>
             {
                 if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
-                {
                     _menu.Show(_hiddenForm, _hiddenForm.PointToClient(Cursor.Position));
-                }
             };
         }
 
@@ -54,9 +52,7 @@
         {
             bool success = _manager.SetPowerLimit(targetMilliwatt);
             if (!success)
-            {
                 MessageBox.Show("Impossible de définir la limite.\nLancez l'application en tant qu'administrateur.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
         private void ExitApplication()
