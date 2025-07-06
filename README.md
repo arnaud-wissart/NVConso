@@ -11,7 +11,7 @@
 
 ## 🚀 Fonctionnalités
 
-- Icône discrète dans le **tray Windows**
+- Icône discrète dans le **tray Windows** 
 - Deux modes d’alimentation :
   - 🧘 **Éco** : limite à ~10% du TDP max
   - 🔥 **Performance** : limite maximale autorisée
