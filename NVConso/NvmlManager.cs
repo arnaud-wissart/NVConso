@@ -1,12 +1,12 @@
-﻿using NvAPIWrapper.GPU;
-using NvAPIWrapper;
-using NvAPIWrapper.Native;
+﻿using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 
 namespace NVConso
 {
-    public static class NvmlManager
+    public class NvmlManager(ILogger<NvmlManager> logger) : INvmlManager
     {
+        private const int EcoPercentage = 10;
+
         private static IntPtr _device;
         private static uint _minLimit;
         private static uint _maxLimit;
@@ -38,53 +38,47 @@ namespace NVConso
             return Marshal.PtrToStringAnsi(ptr) ?? $"Code inconnu {code}";
         }
 
-        public static bool Initialize()
+        public bool Initialize()
         {
-            if (nvmlInit_v2() != 0)
-                return false;
-
-            if (nvmlDeviceGetHandleByIndex(0, out _device) != 0)
-                return false;
-
-            if (nvmlDeviceGetPowerManagementLimitConstraints(_device, out _minLimit, out _maxLimit) != 0)
-                return false;
-
+            if (nvmlInit_v2() != 0) return false;
+            if (nvmlDeviceGetHandleByIndex(0, out _device) != 0) return false;
+            if (nvmlDeviceGetPowerManagementLimitConstraints(_device, out _minLimit, out _maxLimit) != 0) return false;
             return true;
         }
 
-        public static void Shutdown()
+        public void Shutdown()
         {
             nvmlShutdown();
         }
 
-        public static uint GetCurrentPowerLimit()
+        public uint GetCurrentPowerLimit()
         {
             nvmlDeviceGetPowerManagementLimit(_device, out uint currentLimit);
             return currentLimit;
         }
 
-        public static uint GetEcoLimit()
+        public uint GetPowerLimit(GpuPowerMode mode)
         {
-            return (uint)(_minLimit + (_maxLimit - _minLimit) * 10 / 100); // 10% du range
+            return mode switch
+            {
+                GpuPowerMode.Eco => (uint)(_minLimit + (_maxLimit - _minLimit) * EcoPercentage / 100),
+                GpuPowerMode.Performance => _maxLimit,
+                _ => _maxLimit
+            };
         }
 
-        public static uint GetPerformanceLimit()
-        {
-            return _maxLimit;
-        }
-
-        public static bool SetPowerLimit(uint targetMilliwatt)
+        public bool SetPowerLimit(uint targetMilliwatt)
         {
             targetMilliwatt = Math.Clamp(targetMilliwatt, _minLimit, _maxLimit);
             int result = nvmlDeviceSetPowerManagementLimit(_device, targetMilliwatt);
 
             if (result != 0)
             {
-                Console.WriteLine($"[NVML] Erreur : {GetNvmlError(result)} (code {result})");
+                logger.LogInformation($"[NVML] Erreur : {GetNvmlError(result)} (code {result})");
                 return false;
             }
 
-            Console.WriteLine($"[NVML] Limite fixée à {targetMilliwatt} mW");
+            logger.LogInformation($"[NVML] Limite fixée à {targetMilliwatt} mW");
             return true;
         }
     }
