@@ -31,10 +31,6 @@ dotnet test
 - Fichier `nvml.dll` disponible dans le PATH ou à côté de l’exécutable
 - Application **lancée en mode administrateur**
 
-## 📷 Aperçu
-
-![screenshot](./screenshot_nvconso.png)
-
 ## 📦 Installation
 
 1. Télécharge la dernière version depuis l’onglet [Releases](https://github.com/arnaud-wissart/NVConso/releases)
