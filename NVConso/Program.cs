@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Security.Principal;
 
 namespace NVConso
 {
@@ -13,7 +15,29 @@ namespace NVConso
         {
             ApplicationConfiguration.Initialize();
 
-            // Création d'un conteneur DI minimal
+            if (!IsRunAsAdmin())
+            {
+                try
+                {
+                    var startInfo = new ProcessStartInfo(Application.ExecutablePath)
+                    {
+                        Verb = "runas",
+                        UseShellExecute = true,
+                    };
+                    Process.Start(startInfo);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(
+                        "Les droits administrateur sont requis pour ajuster la limite de puissance.",
+                        "NVConso",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+
+                return;
+            }
+
             var services = new ServiceCollection()
                 .AddLogging(config => config.AddSimpleConsole(options =>
                 {
@@ -35,6 +59,13 @@ namespace NVConso
             }
 
             Application.Run(new TrayAppContext(nvml));
+        }
+
+        private static bool IsRunAsAdmin()
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }
