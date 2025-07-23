@@ -16,8 +16,8 @@ namespace NVConso
             _nvml = nvml;
             trayMenu = new ContextMenuStrip();
 
-            if (!_nvml.Initialize())
-                trayMenu.Items.Add("❌ NVML non initialisé");
+            if (!_nvml.CheckCompatibility(out var message) || !_nvml.Initialize())
+                trayMenu.Items.Add($"❌ {message}");
             else
             {
                 var current = _nvml.GetCurrentPowerLimit();

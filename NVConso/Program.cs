@@ -27,6 +27,13 @@ namespace NVConso
             logger.LogInformation("Application démarrée");
 
             var nvml = services.GetRequiredService<INvmlManager>();
+
+            if (!nvml.CheckCompatibility(out var reason))
+            {
+                MessageBox.Show(reason, "NVConso", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             Application.Run(new TrayAppContext(nvml));
         }
     }

@@ -2,6 +2,11 @@
 {
     public class MockNvmlManager(uint minLimit, uint maxLimit) : INvmlManager
     {
+        public bool CheckCompatibility(out string message)
+        {
+            message = string.Empty;
+            return true;
+        }
         public bool Initialize() => true;
 
         public uint GetCurrentPowerLimit() => maxLimit;

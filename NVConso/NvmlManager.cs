@@ -24,6 +24,12 @@ namespace NVConso
         private static extern int nvmlDeviceGetPowerManagementLimitConstraints(IntPtr device, out uint minLimit, out uint maxLimit);
 
         [DllImport("nvml.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int nvmlDeviceGetCount(out int deviceCount);
+
+        [DllImport("nvml.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int nvmlDeviceGetPowerManagementMode(IntPtr device, out uint mode);
+
+        [DllImport("nvml.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int nvmlDeviceSetPowerManagementLimit(IntPtr device, uint limit);
 
         [DllImport("nvml.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -52,6 +58,48 @@ namespace NVConso
         {
             _ = nvmlDeviceGetPowerManagementLimit(_device, out uint currentLimit);
             return currentLimit;
+        }
+
+        public bool CheckCompatibility(out string message)
+        {
+            message = string.Empty;
+
+            int result = nvmlInit_v2();
+            if (result != 0)
+            {
+                message = $"Initialisation NVML impossible : {GetNvmlError(result)}";
+                return false;
+            }
+
+            result = nvmlDeviceGetHandleByIndex(0, out var device);
+            if (result != 0)
+            {
+                message = "Aucun GPU NVIDIA compatible n'a été trouvé.";
+                _ = nvmlShutdown();
+                return false;
+            }
+
+            result = nvmlDeviceGetPowerManagementLimitConstraints(device, out uint min, out uint max);
+            if (result != 0)
+            {
+                message = "La carte ne prend pas en charge la modification du Power Limit.";
+                _ = nvmlShutdown();
+                return false;
+            }
+
+            result = nvmlDeviceGetPowerManagementLimit(device, out uint current);
+            if (result == 0)
+                result = nvmlDeviceSetPowerManagementLimit(device, current);
+
+            _ = nvmlShutdown();
+
+            if (result != 0)
+            {
+                message = "Permission insuffisante pour modifier la limite de puissance (exécutez en mode administrateur).";
+                return false;
+            }
+
+            return true;
         }
 
         public uint GetPowerLimit(GpuPowerMode mode)

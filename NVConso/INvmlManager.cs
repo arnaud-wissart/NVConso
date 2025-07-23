@@ -7,5 +7,6 @@
         uint GetCurrentPowerLimit();
         uint GetPowerLimit(GpuPowerMode mode);
         bool SetPowerLimit(uint targetMilliwatt);
+        bool CheckCompatibility(out string message);
     }
 }
