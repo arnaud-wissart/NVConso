@@ -27,7 +27,7 @@ namespace NVConso
             logger.LogInformation("Application démarrée");
 
             var nvml = services.GetRequiredService<INvmlManager>();
-            Application.Run(new TrayForm(nvml));
+            Application.Run(new TrayAppContext(nvml));
         }
     }
 }

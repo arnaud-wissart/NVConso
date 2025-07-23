@@ -1,24 +1,26 @@
-﻿namespace NVConso
-{
-    public class TrayForm : Form
-    {
-        private readonly NotifyIcon trayIcon;
-        private readonly ContextMenuStrip trayMenu;
-        private readonly List<ToolStripMenuItem> powerItems = new();
-        private readonly INvmlManager _nvml;
+﻿using System.Runtime.InteropServices;
 
-        public TrayForm(INvmlManager nvmlManager)
+namespace NVConso
+{
+    public class TrayAppContext : ApplicationContext
+    {
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private readonly NotifyIcon _icon;
+        private readonly ContextMenuStrip trayMenu;
+        private readonly List<ToolStripMenuItem> powerItems = [];
+        private INvmlManager _nvml;
+        public TrayAppContext(INvmlManager nvml)
         {
-            _nvml = nvmlManager;
+            _nvml = nvml;
             trayMenu = new ContextMenuStrip();
 
             if (!_nvml.Initialize())
-            {
                 trayMenu.Items.Add("❌ NVML non initialisé");
-            }
             else
             {
-                uint current = _nvml.GetCurrentPowerLimit();
+                var current = _nvml.GetCurrentPowerLimit();
                 AddPowerMenuItem("🧘 Mode Éco", _nvml.GetPowerLimit(GpuPowerMode.Eco), current);
                 AddPowerMenuItem("🔥 Mode Performance", _nvml.GetPowerLimit(GpuPowerMode.Performance), current);
             }
@@ -30,24 +32,23 @@
                 Application.Exit();
             });
 
-            trayIcon = new NotifyIcon
-            {
-                Text = "NVConso - Gestion GPU",
+            _icon = new NotifyIcon 
+            { 
+                Visible = true, Text = "NVConso - Gestion GPU",
                 Icon = new Icon("Assets/NVConso.ico"),
                 ContextMenuStrip = trayMenu,
-                Visible = true
             };
 
-            trayIcon.MouseUp += (s, e) =>
+            _icon.MouseUp += (s, e) =>
             {
                 if (e.Button is MouseButtons.Left or MouseButtons.Right)
                 {
                     trayMenu.Hide();
+                    SetForegroundWindow(trayMenu.Handle);
                     trayMenu.Show(Cursor.Position);
                 }
             };
         }
-
         private void AddPowerMenuItem(string label, uint targetLimit, uint current)
         {
             var item = new ToolStripMenuItem($"{label} ({targetLimit / 1000.0:F1} W)")
@@ -60,7 +61,6 @@
             trayMenu.Items.Add(item);
             powerItems.Add(item);
         }
-
         private void OnPowerLimitSelected(object? sender, EventArgs e)
         {
             if (sender is not ToolStripMenuItem clickedItem) return;
@@ -74,25 +74,17 @@
                     item.Checked = false;
 
                 clickedItem.Checked = true;
-                trayIcon.ShowBalloonTip(1000, "GPU", $"Limite fixée à {mw / 1000.0:F1} W", ToolTipIcon.Info);
+                _icon.ShowBalloonTip(1000, "GPU", $"Limite fixée à {mw / 1000.0:F1} W", ToolTipIcon.Info);
             }
             else
             {
-                trayIcon.ShowBalloonTip(1000, "Erreur", "Impossible de modifier la limite. Lancement en tant qu'admin ?", ToolTipIcon.Error);
+                _icon.ShowBalloonTip(1000, "Erreur", "Impossible de modifier la limite. Lancement en tant qu'admin ?", ToolTipIcon.Error);
             }
         }
-
-        protected override void OnLoad(EventArgs e)
+        protected override void Dispose(bool disposing)
         {
-            Visible = false;
-            ShowInTaskbar = false;
-            base.OnLoad(e);
-        }
-
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            trayIcon.Visible = false;
-            base.OnFormClosed(e);
+            _icon.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
