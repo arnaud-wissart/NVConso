@@ -1,5 +1,6 @@
 name: Release
 
+# Les binaires distribuables sont générés uniquement pour un tag de release ou ce lancement manuel dédié.
 on:
   push:
     tags:

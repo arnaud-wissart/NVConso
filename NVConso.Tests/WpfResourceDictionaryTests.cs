@@ -23,10 +23,8 @@ public sealed class WpfResourceDictionaryTests
     {
         RunOnStaThread(() =>
         {
-            var resources = new ResourceDictionary();
-            resources.MergedDictionaries.Add(LoadResourceDictionary("Themes/LightTheme.xaml"));
-            resources.MergedDictionaries.Add(LoadResourceDictionary("Themes/CommonStyles.xaml"));
-            resources.MergedDictionaries.Add(LoadResourceDictionary("Themes/WattPilotWindowStyles.xaml"));
+            Program.EnsureWpfApplication();
+            ResourceDictionary resources = Application.Current.Resources;
 
             AssertStyle<TextBlock>(resources, "FactLabelText");
             AssertStyle<TextBlock>(resources, "FactValueText");

@@ -5,9 +5,8 @@ Cette checklist sert de blocage manuel avant toute release lorsque l'interface a
 ## Environnement
 
 - [ ] Installer ou lancer la build candidate correspondant exactement au commit publié.
-- [ ] Pour tester une PR, télécharger l'artefact GitHub Actions `WattPilot-pr-preview-win-x64`.
-- [ ] Cet artefact sert au test manuel de l'UI et du comportement applicatif.
-- [ ] L'auto-update Velopack ne se teste pas avec cet artefact PR.
+- [ ] Pour tester une PR, compiler ou publier localement le commit examiné ; la CI standard ne fournit pas d'artefact exécutable.
+- [ ] Tester l'installation et l'auto-update Velopack uniquement avec les fichiers générés par le workflow de release pour un tag existant.
 - [ ] Vérifier que l'application est lancée en utilisateur standard.
 - [ ] Préparer au moins une machine Windows avec un GPU NVIDIA lorsque les profils GPU doivent être validés réellement.
 
@@ -42,6 +41,7 @@ Cette checklist sert de blocage manuel avant toute release lorsque l'interface a
 - [ ] Détails techniques repliés : l'accueil reste centré sur les informations essentielles.
 - [ ] Détails techniques dépliés : les métriques secondaires restent lisibles et ne masquent pas les actions principales.
 - [ ] Menu tray : entrée d'ouverture WattPilot, modes GPU, statut de mise à jour et action quitter visibles.
+- [ ] Menu tray : un clic en dehors ferme le menu sans appliquer de nouveau le mode GPU actif.
 
 ## Validation de sortie
 
